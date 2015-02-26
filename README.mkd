@@ -74,6 +74,7 @@ In random-priority order:
 - [ ] allow configuration of output langage;    
 - [ ] unit tests;  
 - [ ] usage example;  
+- [ ] base tables on source code instead of only vocabulary;  
 - [X] upload on pypi and github (see links below);  
 
 
