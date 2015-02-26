@@ -7,3 +7,4 @@ bin/
 lib/
 include/
 ACCC.egg-info/
+dist/
