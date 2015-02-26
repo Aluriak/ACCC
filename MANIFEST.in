@@ -1,0 +1,3 @@
+include *.mkd
+exclude *.cfg Makefile
+recursive-include accc *
