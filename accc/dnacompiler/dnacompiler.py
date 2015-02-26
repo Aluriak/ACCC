@@ -35,17 +35,6 @@ class DNACompiler(Compiler):
 #########################
 # FUNCTIONS             #
 #########################
-def mutated(dna, mutation_rate=0.1):
-    new_dna = ''
-    for nuc in dna:
-        if random.random() < mutation_rate:
-            new_dna += random.choice(dc.alphabet)
-        else:
-            new_dna += nuc
-    return new_dna
-
-
-
 if __name__ == '__main__':
     import random, time
 
