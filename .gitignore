@@ -5,4 +5,5 @@ __pycache__/
 build/
 bin/
 lib/
+include/
 ACCC.egg-info/
