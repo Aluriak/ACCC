@@ -32,16 +32,16 @@ That's all. No loops, variables, functions, objects,… Just conditions and acti
 This is an example of code, not totally illogic, created one time with a source code size of 60 and the alphabet '01':  
 
         if parameter1 == parameter2 and haveThat:
-            doThat
-            if haveThat:
-                sayThis
-                doThat
-                if knowThat and haveManyThings:
-                    doThat
-                    sayThis
-                doThat
-            if haveManyThings:
-                sayThis
+            do_that
+            if have_that:
+                say_this
+                do_that
+                if know_that and have_many_things:
+                    do_that
+                    say_this
+                do_that
+            if have_many_things:
+                say_this
 
 Please have a look to docstring of *Compiler* class for more details about that. (notabily used vocabulary)  
 
