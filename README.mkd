@@ -1,0 +1,75 @@
+# Always Correct Correctness Compiler
+Python implementation of a very basic langage compiler that never throw errors while compiling. (almost)  
+Its not a big and complex compiler, and its implementation is something like awful.
+
+
+## Errors
+The only errors releved by the compiler is :
+- source code contains characters not present in provided alphabet;
+- provided vocabulary don't follow conventions of writing;
+
+If these conditions are respected, whatever you give to the __ACCC__, it will always return something valid.
+(but it can be an empty code)
+
+
+## Interests
+A compilable source code is a string of characters.  
+Valid characters are provided at Compiler instanciation.  
+
+For example, if you have the alphabet *'01'*, 
+any string exclusively composed of *'0'* and *'1'* is compilable and will produce something.  
+
+Any little modification of the string can lead to heavy or no modification of object code.  
+In fact, with ACCC you can generate mutation of a source code without problem of compilation error.  
+
+Write a code with lots of parameters is another way to do almost the same thing.
+
+
+## Object code
+Currently, current object langage is __very simple__: you can compare things, and do things.
+That's all. No loops, variables, functions, objects,… Just conditions and actions.
+
+This is an example of code, not totally illogic, created one time with a source code size of 60 and the alphabet '01':  
+
+        if parameter1 == parameter2 and haveThat:
+            doThat
+            if haveThat:
+                sayThis
+                doThat
+                if knowThat and haveManyThings:
+                    doThat
+                    sayThis
+                doThat
+            if haveManyThings:
+                sayThis
+
+Please have a look to docstring of *Compiler* class for more details about that. (notabily used vocabulary)  
+
+
+## I/O speaking
+Inputs:
+- iterable of characters (doublons are unexpected) that compose the source code  
+- vocabulary used for compiling  
+
+Outputs:  
+- a python compilable code, according to vocabulary  
+
+
+## Next improvements
+In decreasing-priority order:  
+- [ ] allow lexems to have arguments;  
+- [ ] create before convert in any langage;  
+- [ ] allow configuration of output langage;    
+
+
+
+## Why don't you use…
+Someone do the same thing ? Or better ?  
+Give me the link, i want to see that !
+
+
+## Why do that ?
+1. It's fun
+2. I need it for test something in another project (an Evolution simulation named [EvolAcc](http://www.github.com/Aluriak/EvolAcc) ; no surprise)
+
+
