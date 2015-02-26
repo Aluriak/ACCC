@@ -2,3 +2,7 @@
 .*.swo
 __pycache__/
 *.pyc
+build/
+bin/
+lib/
+ACCC.egg-info/
