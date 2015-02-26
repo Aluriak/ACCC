@@ -214,10 +214,10 @@ class Compiler():
         def reader(seq, block_size):
             identificator = ''
             for char in source_code:
-                identificator += char
                 if len(identificator) == self.idnt_values_size[lexem_type]:
                     yield self.table_values[lexem_type][identificator]
                     identificator = ''
+                identificator += char
         lexem_reader = reader(source_code, self.idnt_values_size)
         lexem = None
         time_out = 0
