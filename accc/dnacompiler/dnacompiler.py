@@ -27,13 +27,7 @@ class DNACompiler(Compiler):
     """
     def __init__(self, comparables, predicats, actions, operators):
         """"""
-        vocabulary_values = {
-            LEXEM_TYPE_COMPARISON: comparables,
-            LEXEM_TYPE_PREDICAT  : predicats,
-            LEXEM_TYPE_ACTION    : actions,
-            LEXEM_TYPE_OPERATOR  : operators,
-        }
-        super().__init__('ATGC', vocabulary_values)
+        super().__init__('ATGC', comparables, predicats, actions, operators)
 
 
 
