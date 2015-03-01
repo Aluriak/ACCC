@@ -19,11 +19,11 @@ from accc.dnacompiler import DNACompiler
 # PRE-DECLARATIONS      #
 #########################
 # SIMULATION PARAMETERS
-POP_SIZE        = 24
-KEEPED_BY_GEN   = 16
+POP_SIZE        = 30
+KEEPED_BY_GEN   = 12
 CRISIS_TIME     = 50
-MUTATION_RATE   = 0.001
-MUTATION_CHANCE = 0.4
+MUTATION_RATE   = 0.01
+MUTATION_CHANCE = 0.7
 PARENT_COUNT    = 2
 
 
@@ -33,6 +33,7 @@ NUCLEOTIDS      = 'ATGC'
 FITNESS_ON_OFF  = True
 FITNESS_SWITCH  = False
 SCREEN_REFRESH  = 10
+SCREEN_SHOWED   = 3
 
 # HELPS
 clear = lambda: os.system('clear')
@@ -70,7 +71,7 @@ class Unit():
 # CONSTRUCTOR #################################################################
 # PUBLIC METHODS ##############################################################
     def exec_fun(self):
-        self.fitness = 0
+        #self.fitness = 0
         exec(self.code)
 
 # PRIVATE METHODS #############################################################
@@ -83,12 +84,58 @@ class Unit():
     
 # CLASS METHODS ###############################################################
     @staticmethod
+    def from_pop(pop, parent_count, compiler, count=1):
+        """Create a list of count Unit, by choosing parent_count parents in pop.
+        High fitness improves probability of reproduction."""
+        #from collections import defaultdict
+        #stats = defaultdict(int)
+        probs = tuple((u,u.abs_fitness) for u in pop)
+        max_prob = sum(u.abs_fitness for u in pop)
+
+        # get one parent
+        def oneParent():
+            """Return a unit, taked in pop. Higher is the fit, 
+            higher is the chance to be selectionned."""
+            if max_prob is 0: return pop[0]
+            parent = None
+            cur_prob = random.randrange(0, max_prob)
+            for unit, fit in probs:
+                cur_prob -= fit
+                if cur_prob <= 0:
+                    parent = unit
+                    break
+            #stats[parent] += 1
+            assert(parent is not None)
+            return parent
+
+        # get count new unit
+        new_units = []
+        for _ in range(count):
+            parents = (oneParent(), oneParent())
+            new_units.append(
+                Unit.from_parents(parents, compiler)
+            )
+
+        #print('\t'.join(str(u.abs_fitness) for u in pop))
+        #print('\t'.join(str(stats[u]) for u in pop))
+        #print('')
+        return new_units
+
+
+
+
+
+
+
+    @staticmethod
     def from_parents(parents, compiler):
         """Create a new Unit, result of given parent crossing."""
+        #new_dna = sorted(parents, key=lambda x: x.fitness, reverse=True)[0].dna
+
         parent = random.choice(parents) 
         new_dna = ''
         for index in range(min(len(p.dna) for p in parents)):
-            if random.randint(0, 100): 
+            if random.randint(0, 100) == 0: 
                 parent = random.choice(parents) 
             new_dna += parent.dna[index]
         return Unit.mutated(compiler, new_dna)
@@ -116,6 +163,10 @@ class Unit():
     def dna_len(self):
         return len(self.dna)
 
+    @property
+    def abs_fitness(self):
+        return abs(self.fitness)
+
 # CONVERSION ##################################################################
     def __str__(self):
         return str(self.fitness)
@@ -132,22 +183,17 @@ class Unit():
 #########################
 # FUNCTIONS             #
 #########################
+def FITNESS_ON():  return     FITNESS_ON_OFF
+def FITNESS_OFF(): return not FITNESS_ON_OFF
+
+
 if __name__ == '__main__':
     bobby = DNACompiler(
-        ('random.randint(0,1)', '0'),
-        ('FITNESS_ON_OFF', 'FITNESS_SWITCH'),
-        ('self.fitness += 10', 'self.fitness -= 10', 'self.fitness *= 10', 'self.fitness *= -1'),
+        ('random.randint(0,1)', '0', '1'),
+        ('FITNESS_ON()', 'FITNESS_OFF()', 'FITNESS_ON_OFF', 'FITNESS_SWITCH', 'True', 'False'),
+        ('self.fitness += 1', 'self.fitness -= 1', 'self.fitness *= -1', 'pass', 'self.fitness = 0'),
         ('==', '<'),
     )
-
-    #u = Unit(bobby)
-    #print(u.code)
-    #print(u.dna)
-    #print(bobby.compile(u.dna))
-    #print(u.fitness)
-    #u.exec_fun()
-    #print(u.fitness)
-    #exit(0)
 
     # create population
     pop = [Unit(bobby) for _ in range(POP_SIZE)]
@@ -164,26 +210,28 @@ if __name__ == '__main__':
             clear()
             print('FITNESS_ON_OFF  :', FITNESS_ON_OFF)
             print('FITNESSES       :', [u.fitness for u in pop])
+            print('KEEPED          :', [u.fitness for u in pop][:KEEPED_BY_GEN])
             print('GENERATION_COUNT:', gen_count, end='\n\n\n')
-            print(pop[0].dna)
-            print(pop[0].python_code)
+            for i in range(SCREEN_SHOWED):
+                print(i, ':', pop[i].dna, tuple(pop[i].dna == u.dna for u in pop).count(True))
+                print(pop[i].python_code, end='\n\n\n')
         gen_count += 1
 
         # create new pop
-        pop = pop[KEEPED_BY_GEN:]
+        pop = pop[:KEEPED_BY_GEN]
         new_pop = list(pop)
-        while len(new_pop) < POP_SIZE:
-            new_pop.append(
-                Unit.from_parents(random.sample(pop, PARENT_COUNT), bobby)
-            )
+        new_pop.extend(
+            Unit.from_pop(pop, PARENT_COUNT, bobby, POP_SIZE - len(new_pop))
+        )
         pop = new_pop
+        assert(len(pop) == POP_SIZE)
 
         # Biological crisis ?
-        if gen_count % CRISIS_TIME == 0:
+        FITNESS_SWITCH = False
+        #if gen_count % CRISIS_TIME == 0:
+        if random.randint(0, CRISIS_TIME) == 0:
             FITNESS_ON_OFF = not FITNESS_ON_OFF
             FITNESS_SWITCH = True
-        else:
-            FITNESS_SWITCH = False
 
         time.sleep(0.01)
 
