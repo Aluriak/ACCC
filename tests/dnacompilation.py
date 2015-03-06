@@ -11,6 +11,7 @@ import os
 import random
 
 from accc.dnacompiler import DNACompiler
+from accc.langspec    import python_spec
 
 
 
@@ -188,7 +189,7 @@ def FITNESS_OFF(): return not FITNESS_ON_OFF
 
 
 if __name__ == '__main__':
-    bobby = DNACompiler(
+    bobby = DNACompiler(python_spec,
         ('random.randint(0,1)', '0', '1'),
         ('FITNESS_ON()', 'FITNESS_OFF()', 'FITNESS_ON_OFF', 'FITNESS_SWITCH', 'True', 'False'),
         ('self.fitness += 1', 'self.fitness -= 1', 'self.fitness *= -1', 'pass', 'self.fitness = 0'),

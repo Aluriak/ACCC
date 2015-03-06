@@ -5,6 +5,7 @@ Simple test of Compiler class.
 
 
 from accc.compiler import Compiler
+from accc.langspec import ada_spec
 import random, time
             
 
@@ -21,7 +22,7 @@ def mutated(src, mutation_rate=0.1):
 
 
 # creat compiler
-dc = Compiler('BÉPO',
+dc = Compiler('BÉPO', ada_spec,
               ('speed', 'word_per_minute', 'int_value'),
               ('is_reachable', 'is_pressable',),
               ('miss', 'press'),
@@ -35,7 +36,7 @@ while True:
     msrc = mutated(src)
     print(''.join([' ' if n == m else '!' for n, m in zip(src, msrc)]))
     print(dc.compile(msrc))
-    print(dc.header(src), dc.structure(src), dc.values(src), sep='|', end='\n------------\n\n\n\n')
+    print('\n------------\n\n\n')
 
     time.sleep(0.4)
 
