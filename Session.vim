@@ -9,11 +9,15 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +1 accc/__main__.py
-badd +0 accc/__init__.py
-badd +0 accc/compiler/compiler.py
-badd +0 accc/compiler/__init__.py
-badd +0 accc/dnacompiler/dnacompiler.py
-badd +0 accc/dnacompiler/__init__.py
+badd +1 accc/__init__.py
+badd +1 accc/compiler/compiler.py
+badd +1 accc/compiler/__init__.py
+badd +1 accc/dnacompiler/dnacompiler.py
+badd +1 accc/dnacompiler/__init__.py
+badd +0 accc/language/language.py
+badd +0 accc/language/python.py
+badd +0 accc/lexems/lexems.py
+badd +0 accc/langspec/langspec.py
 argglobal
 silent! argdel *
 argadd ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/__main__.py
@@ -32,6 +36,7 @@ set winheight=1 winwidth=1
 exe 'vert 1resize ' . ((&columns * 119 + 119) / 239)
 exe 'vert 2resize ' . ((&columns * 119 + 119) / 239)
 argglobal
+edit accc/__main__.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -41,12 +46,12 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 28) / 56)
+let s:l = 38 - ((37 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+38
+normal! 034|
 wincmd w
 argglobal
 2argu
@@ -92,16 +97,17 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 28) / 56)
+let s:l = 160 - ((18 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+160
+normal! 05|
+lcd ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler
 wincmd w
 argglobal
 1argu
-edit accc/compiler/__init__.py
+edit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/compiler/__init__.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -120,7 +126,7 @@ normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 119 + 119) / 239)
 exe 'vert 2resize ' . ((&columns * 119 + 119) / 239)
-tabedit accc/dnacompiler/dnacompiler.py
+tabedit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/dnacompiler/dnacompiler.py
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
@@ -133,7 +139,7 @@ set winheight=1 winwidth=1
 exe 'vert 1resize ' . ((&columns * 119 + 119) / 239)
 exe 'vert 2resize ' . ((&columns * 119 + 119) / 239)
 argglobal
-edit accc/dnacompiler/dnacompiler.py
+edit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/dnacompiler/dnacompiler.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -143,15 +149,15 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 28) / 56)
+let s:l = 11 - ((10 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+11
 normal! 0
 wincmd w
 argglobal
-edit accc/dnacompiler/__init__.py
+edit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/dnacompiler/__init__.py
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -170,7 +176,55 @@ normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 119 + 119) / 239)
 exe 'vert 2resize ' . ((&columns * 119 + 119) / 239)
-tabnext 1
+tabedit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/lexems/lexems.py
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+argglobal
+edit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/lexems/lexems.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 28 - ((27 * winheight(0) + 28) / 56)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+28
+normal! 03|
+lcd ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler
+tabedit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/langspec/langspec.py
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+argglobal
+edit ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler/accc/langspec/langspec.py
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1 - ((0 * winheight(0) + 28) / 56)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+1
+normal! 0
+lcd ~/Programmation/Python/AlwaysCorrectCorrectnessCompiler
+tabnext 5
 set stal=1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
