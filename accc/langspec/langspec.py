@@ -74,7 +74,7 @@ def translated(structure, values, lang_spec):
     push = lambda x: stack.append(x)
     pop  = lambda  : stack.pop()
     last = lambda  : stack[-1] if len(stack) > 0 else ' '
-    def indented_code(s, level, end=''):
+    def indented_code(s, level, end):
         return lang_spec[INDENTATION]*level + s + end
 
     # recreate python structure, and replace type by value
@@ -96,11 +96,11 @@ def translated(structure, values, lang_spec):
                 ))
                 # if provided, print the begin block token on a new line
                 if len(lang_spec[BEG_BLOCK]) > 0:
-                    object_code += (indented_code( 
+                    object_code += indented_code( 
                         lang_spec[BEG_BLOCK],
                         level, 
                         lang_spec[END_LINE]
-                    ))
+                    )
                 stack = []
                 level += 1
             # and place the action
@@ -113,21 +113,24 @@ def translated(structure, values, lang_spec):
         elif lexem_type in CONDITIONS:
             push(lexem_type)
         elif lexem_type is DOWNLEVEL:
-            # down level, and add a END_BLOCK only if needed
-            level -= 1
-            if level >= 0:
-                object_code += indented_code(
-                    lang_spec[END_BLOCK], level
-                )
-            else:
-                level = 0
+            if last() not in CONDITIONS:
+                # down level, and add a END_BLOCK only if needed
+                level -= 1
+                if level >= 0:
+                    object_code += indented_code(
+                        lang_spec[END_BLOCK], level,
+                        lang_spec[END_LINE]
+                    )
+                else:
+                    level = 0
 
     # add END_BLOCK while needed for reach level 0
     while level > 0:
         level -= 1
         if level >= 0:
             object_code += indented_code(
-                lang_spec[END_BLOCK], level
+                lang_spec[END_BLOCK], level,
+                lang_spec[END_LINE]
             )
         else:
             level = 0
@@ -148,7 +151,7 @@ def cpp_spec():
     return {
         INDENTATION    : '\t',
         BEG_BLOCK      : '{',
-        END_BLOCK      : '}\n',
+        END_BLOCK      : '}',
         BEG_LINE       : '',
         END_LINE       : '\n',
         BEG_ACTION     : '',
@@ -171,7 +174,7 @@ def ada_spec():
     return {
         INDENTATION    : '\t',
         BEG_BLOCK      : '',
-        END_BLOCK      : 'end if;\n',
+        END_BLOCK      : 'end if;',
         BEG_LINE       : '',
         END_LINE       : '\n',
         BEG_ACTION     : '',
