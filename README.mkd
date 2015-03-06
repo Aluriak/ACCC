@@ -14,7 +14,7 @@ If these conditions are respected, whatever you give to the __ACCC__, it will al
 
 
 ## Bias
-If compiled source code is too short, or made of lots of repetitions, 
+If compiled source code is too short, or made of lots of repeatitions, 
 some bias can appear:  
 - always same values in object code  
 - lots of neutral values  
@@ -40,7 +40,8 @@ Write a code with lots of parameters is another way to do almost the same thing.
 Currently, current object langage is __very simple__: you can compare things, and do things.
 That's all. No loops, variables, functions, objects,… Just conditions and actions.
 
-This is an example of code, not totally illogic, created one time with a source code size of 60 and the alphabet '01':  
+This is an example of code, not totally illogic, created one time with a source code size of 60, 
+the python specification and the alphabet '01':  
 (indentation can miss)   
 
         if parameter1 == parameter2 and haveThat:
@@ -64,16 +65,15 @@ Inputs:
 - vocabulary used for compiling  
 
 Outputs:  
-- a python compilable code, according to vocabulary  
+- a python (or other, depending of your language specification) compilable code, according to vocabulary  
 
 
 ## Next improvements
 In random-priority order:  
 - [ ] allow lexems to have arguments;  
-- [ ] create before convert in any langage;  
-- [ ] allow configuration of output langage;    
+- [X] allow configuration of output langage;    
 - [ ] unit tests;  
-- [ ] usage example;  
+- [X] usage example (see tests repertory);  
 - [ ] base tables on source code instead of only vocabulary;  
 - [X] upload on pypi and github (see links below);  
 
