@@ -7,8 +7,7 @@
 #########################
 # IMPORTS               #
 #########################
-from accc.compiler import Compiler, LEXEM_TYPE_COMPARISON, LEXEM_TYPE_PREDICAT
-from accc.compiler import           LEXEM_TYPE_ACTION    , LEXEM_TYPE_OPERATOR
+from accc.compiler import Compiler
 
 
 
@@ -25,9 +24,9 @@ class DNACompiler(Compiler):
     """
     Compiler specialized in DNA: vocabulary is 'ATGC'.
     """
-    def __init__(self, comparables, predicats, actions, operators):
+    def __init__(self, target_language_spec, comparables, predicats, actions, operators):
         """"""
-        super().__init__('ATGC', comparables, predicats, actions, operators)
+        super().__init__('ATGC', target_language_spec, comparables, predicats, actions, operators)
 
 
 
@@ -37,6 +36,7 @@ class DNACompiler(Compiler):
 #########################
 if __name__ == '__main__':
     import random, time
+    from accc.langspec import python as python_spec
 
             
     def mutated(dna, mutation_rate=0.1):
@@ -49,7 +49,8 @@ if __name__ == '__main__':
         return new_dna
 
 
-    dc = DNACompiler(('temperature',),
+    dc = DNACompiler(python_spec,
+                     ('temperature',),
                      ('haveNeighbors',),
                      ('die', 'duplicate'),
                      ('>', '==', '<')
