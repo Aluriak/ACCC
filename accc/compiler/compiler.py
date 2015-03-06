@@ -7,27 +7,20 @@ from itertools import zip_longest
 from functools import partial, lru_cache
 import itertools
 
-
+import accc.langspec as langspec 
 
 
 #########################
 # PRE-DECLARATIONS      #
 #########################
 # lexems seens in structure
-LEXEM_TYPE_CONDITION = 'C'
-LEXEM_TYPE_ACTION    = 'A'
-LEXEM_TYPE_PREDICAT  = 'P'
-LEXEM_TYPE_DOWNLEVEL = 'D'
+from accc.lexems import LEXEM_TYPE_CONDITION, LEXEM_TYPE_ACTION 
+from accc.lexems import LEXEM_TYPE_PREDICAT, LEXEM_TYPE_DOWNLEVEL 
 # lexems only seen in values
-LEXEM_TYPE_COMPARISON   = 'C'
-LEXEM_TYPE_OPERATOR     = 'O'
-# shortcuts
-VOCABULARY_STRUCT = [
-    LEXEM_TYPE_CONDITION,
-    LEXEM_TYPE_ACTION,
-    LEXEM_TYPE_PREDICAT,
-    LEXEM_TYPE_DOWNLEVEL,
-]
+from accc.lexems import LEXEM_TYPE_COMPARISON, LEXEM_TYPE_OPERATOR 
+from accc.lexems import LEXEM_TYPE_UINTEGER 
+# all lexems
+from accc.lexems import ALL as ALL_LEXEMS
 
 
 
@@ -42,15 +35,9 @@ class Compiler():
     Whatever the given source_code, it's always compilable. (but can return empty object code)
     Also, it can be totally illogic (do many times the same test, do nothing,…)
 
-    The source code is readed by following this format:
+    The source code is readed entirely for determine STRUCTURE, 
+    and then re-readed for determines effectives VALUES.
 
-        ......|......................|............................
-        HEADER      STRUCTURE                  VALUES
-
-    The HEAD defines:
-        - where STRUCTURE and VALUES start in the code (two integers)
-        - where STRUCTURE and VALUES stop  in the code (two integers)
-        - so, STRUCTURE and VALUES can overlap, be empty, or use a very little part of the source code
     The STRUCTURE defines:
         - logic of the code
         - lexems type that will be used
@@ -102,18 +89,19 @@ class Compiler():
     Modification of provided lexems types is not supported at this time.
     """
 # CONSTRUCTOR #################################################################
-    def __init__(self, alphabet, comparables, predicats, actions, operators, 
+    def __init__(self, alphabet, target_language_spec, comparables, predicats, actions, operators, 
                  neutral_value_condition='True', neutral_value_action='pass'):
         """
-        Wait for alphabet ('01', 'ATGC',…), and vocabularies of 
+        Wait for alphabet ('01', 'ATGC',…), language specification and vocabularies of 
             structure and values parts.
         Neutral value is used when no value is finded. 
             Set it to something that pass in all cases.
             NB: a little source code lead to lots of neutral values.
         """
-        self.alphabet       = alphabet
-        self.voc_structure  = VOCABULARY_STRUCT
-        self.voc_values     = {
+        self.alphabet         = alphabet
+        self.voc_structure    = ALL_LEXEMS
+        self.target_lang_spec = target_language_spec()
+        self.voc_values       = {
             LEXEM_TYPE_COMPARISON: comparables,
             LEXEM_TYPE_PREDICAT  : predicats,
             LEXEM_TYPE_ACTION    : actions,
@@ -134,19 +122,13 @@ class Compiler():
         """Compile given source code.
         Return object code, modified by given post treatment.
         """
-        self._parts_bounds_lookup(source_code)
         # read structure
-        struct_bounds_beg, struct_bounds_end = self.struct_bounds
-        values_bounds_beg, values_bounds_end = self.values_bounds
-        structure = self._structure(
-            source_code[struct_bounds_beg:struct_bounds_end]
-        )
-        # read values
-        #print(self._struct_to_values(structure, source_code))
-        obj_code = self._pythonized(
-            structure, self._struct_to_values(
-                structure, source_code[values_bounds_beg:values_bounds_end]
-            )
+        structure = self._structure(source_code)
+        values    = self._struct_to_values(structure, source_code)
+        # create object code, translated in targeted language
+        obj_code = langspec.translated(
+            structure, values, 
+            self.target_lang_spec
         )
         # apply post treatment and return
         return obj_code if post_treatment is None else post_treatment(obj_code)
@@ -174,38 +156,6 @@ class Compiler():
                 if len(lexem) == block_size:
                     yield self.table_struct[seq[index:index+block_size]]
         return tuple(cutter(source_code, self.idnt_struct_size))
-
-    def _pythonized(self, structure, values):
-        """Return python code associated to given structure and values"""
-        #print('SOURCE:', structure, values)
-        python_code = ""
-        stack = []
-        # define shortcuts to behavior
-        push = lambda x: stack.append(x)
-        pop  = lambda  : stack.pop()
-        last = lambda  : stack[-1] if len(stack) > 0 else ' '
-        def indented_code(s, level):
-            return '\t'*level + s + '\n'
-
-        # recreate python structure, and replace type by value
-        level = 0
-        CONDITIONS = [LEXEM_TYPE_PREDICAT, LEXEM_TYPE_CONDITION]
-        ACTION = LEXEM_TYPE_ACTION
-        DOWNLEVEL = LEXEM_TYPE_DOWNLEVEL
-        for lexem_type in structure:
-            if lexem_type is ACTION:
-                if last() in CONDITIONS:
-                    value, values = values[0:len(stack)], values[len(stack):]
-                    python_code += indented_code('if ' + ' and '.join(value) + ':', level)
-                    stack = []
-                    level += 1
-                python_code += indented_code(values[0], level)
-                values = values[1:]
-            elif lexem_type in CONDITIONS:
-                push(lexem_type)
-            elif lexem_type is DOWNLEVEL:
-                level = max(level-1, 0)
-        return python_code
 
     def _next_lexem(self, lexem_type, source_code, source_code_size):
         """Return next readable lexem of given type in source_code.
@@ -257,6 +207,7 @@ class Compiler():
 
 
 
+    @lru_cache(maxsize = 127) # source code is potentially largely variable on length
     def _integer_size_for(self, source_code_size):
         """Find and return the optimal integer size.
         A perfect integer can address all indexes of 
@@ -295,31 +246,6 @@ class Compiler():
             values.append(new_value)
 
         return values
-
-
-
-    def _parts_bounds_lookup(self, source_code):
-        """Compute bounds of the three parts of given source_code."""
-        # define size of an integer and four of them in the HEADER
-        integer_size = self._integer_size_for(len(source_code))
-        slices = (
-            # bound start  , bound end     , step
-            (0             , integer_size*1,  1),
-            (integer_size*1, integer_size*2,  1),
-            (integer_size*2, integer_size*3,  1),
-            (integer_size*3, integer_size*4,  1),
-        )
-        integers = []
-        for slice_beg, slice_end, step in slices:
-            integer = self._string_to_int(source_code[slice_beg:slice_end:step])
-            integers.append(integer % len(source_code))
-        # associate each integer as a bound of STRUCTURE and VALUES
-        integers.sort()
-        assert(len(integers) is 4)
-        # create attributes
-        self.header_bounds = (0, 4*integer_size)
-        self.struct_bounds = (integers[0], integers[1])
-        self.values_bounds = (integers[2], integers[3])
 
 
         
@@ -387,12 +313,6 @@ class Compiler():
 
 # PREDICATS ###################################################################
 # ACCESSORS ###################################################################
-    def header(self, source_code):
-        return source_code[self.header_bounds[0]:self.header_bounds[1]]
-    def structure(self, source_code):
-        return source_code[self.struct_bounds[0]:self.struct_bounds[1]]
-    def values(self, source_code):
-        return source_code[self.values_bounds[0]:self.values_bounds[1]]
 # CONVERSION ##################################################################
 # OPERATORS ###################################################################
 
