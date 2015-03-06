@@ -3,8 +3,7 @@
 # IMPORTS               #
 #########################
 from accc.compiler import Compiler
-from accc.compiler import LEXEM_TYPE_COMPARISON, LEXEM_TYPE_PREDICAT  
-from accc.compiler import LEXEM_TYPE_ACTION    , LEXEM_TYPE_OPERATOR  
+from accc.langspec import python_spec
 
 import random, time
 
@@ -30,8 +29,7 @@ if __name__ == '__main__':
 
     # create compiler
     alphabet = '01'
-    source_code_size = 60
-    cc  = Compiler(alphabet,
+    cc  = Compiler(alphabet, python_spec,
                     ('parameter1', 'parameter2', 'parameter3', 'parameter4', 'int_value'),
                     ('have_that', 'is_this', 'have_many_things', 'know_that'),
                     ('do_that', 'say_this', 'do_it'),
@@ -39,15 +37,14 @@ if __name__ == '__main__':
                   )
 
     # print source code, compile it, modify it, and loop ad vitam eternam
+    source_code_size = 60
     source = ''.join((random.choice(alphabet) for _ in range(source_code_size)))
     while True:
         print(source)
         msource = mutated(source, alphabet)
         print(''.join([' ' if n == m else m for n, m in zip(source, msource)]))
         print(cc.compile(msource))
-        print(cc.header(msource), cc.structure(msource), cc.values(msource), 
-              sep='|', end='\n'+source_code_size*'-'+'\n'+source_code_size*'-'+'\n'
-             )
+        print(source_code_size*'-')
         source = msource
         time.sleep(0.1)
 
