@@ -23,13 +23,13 @@ from accc.langspec    import python_spec
 POP_SIZE        = 30
 KEEPED_BY_GEN   = 12
 CRISIS_TIME     = 50
-MUTATION_RATE   = 0.01
+MUTATION_RATE   = 0.05
 MUTATION_CHANCE = 0.7
 PARENT_COUNT    = 2
 
 
 # SIMULATION DEFINITION
-DEFAULT_DNA_LEN = 40
+DEFAULT_DNA_LEN = 30
 NUCLEOTIDS      = 'ATGC'
 FITNESS_ON_OFF  = True
 FITNESS_SWITCH  = False
@@ -65,7 +65,7 @@ class Unit():
             self.dna = dna
 
         self.python_code = dc.compile(self.dna)
-        self.code        = compile(self._decorate(self.python_code), '<string>', 'exec')
+        self.code        = compile(self.python_code, '<string>', 'exec')
         self.fitness = 0
 
 
@@ -76,13 +76,6 @@ class Unit():
         exec(self.code)
 
 # PRIVATE METHODS #############################################################
-    def _decorate(self, code):
-        objc = code
-        #objc = "def func_dna(self):\n"
-        #for line in code.split('\n'):
-            #objc += "\t" + line + "\n"
-        return objc
-    
 # CLASS METHODS ###############################################################
     @staticmethod
     def from_pop(pop, parent_count, compiler, count=1):
